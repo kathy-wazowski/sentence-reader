@@ -40,38 +40,58 @@ function App() {
   }, [isReadingMode, sentences.length, exitReadingMode]);
 
   const splitSentencesCustom = (text) => {
-    const result = [];
-    let currentSentence = "";
-    let inQuote = false;
-
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      currentSentence += char;
-
-      if (char === '"') {
-        inQuote = !inQuote;
+    const sentences = [];
+    const quotePairs = {
+      '"': '"',
+      "'": "'",
+      '“': '”',
+      '‘': '’',
+    };
+    let i = 0;
+    while (i < text.length) {
+      let start = i;
+      // Skip leading whitespace
+      while (start < text.length && /\s/.test(text[start])) {
+        start++;
       }
 
-      if (char === '.' && !inQuote) {
-        let trimmedSentence = currentSentence.trim();
-        if (trimmedSentence.length > 0) {
-          if (!trimmedSentence.endsWith('.')) { // Ensure period is added back if it was part of the split
-            trimmedSentence += '.';
-          }
-          result.push(trimmedSentence);
+      if (start >= text.length) break;
+
+      const startChar = text[start];
+      if (Object.keys(quotePairs).includes(startChar)) {
+        const endQuoteChar = quotePairs[startChar];
+        let endQuote = text.indexOf(endQuoteChar, start + 1);
+        if (endQuote === -1) { // No matching quote, treat rest of text as one sentence
+          sentences.push(text.substring(start).trim());
+          break;
         }
-        currentSentence = "";
-      }
-    }
+        // Include the quote in the sentence
+        let sentence = text.substring(start, endQuote + 1);
+        sentences.push(sentence.trim());
+        i = endQuote + 1;
+      } else {
+        let endMarks = [];
+        let nextPeriod = text.indexOf('.', start);
+        if (nextPeriod !== -1) endMarks.push(nextPeriod);
+        let nextQuestion = text.indexOf('?', start);
+        if (nextQuestion !== -1) endMarks.push(nextQuestion);
+        let nextExclamation = text.indexOf('!', start);
+        if (nextExclamation !== -1) endMarks.push(nextExclamation);
 
-    if (currentSentence.trim().length > 0) {
-      let trimmedSentence = currentSentence.trim();
-      if (!trimmedSentence.endsWith('.') && !trimmedSentence.endsWith('"')) { // Add period if it's the last sentence and doesn't end with a period or quote
-        trimmedSentence += '.';
+        if (endMarks.length === 0) { // No more sentence terminators
+          sentences.push(text.substring(start).trim());
+          break;
+        }
+
+        // Find the earliest sentence terminator
+        let endOfSentence = Math.min(...endMarks);
+        
+        let sentence = text.substring(start, endOfSentence + 1);
+        sentences.push(sentence.trim());
+        i = endOfSentence + 1;
       }
-      result.push(trimmedSentence);
     }
-    return result;
+    return sentences.filter((s) => s.length > 0);
   };
 
   const handleSubmit = useCallback(() => {
