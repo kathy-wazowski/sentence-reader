@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/static/css/main.05fbb824.css",
-    "main.js": "/static/js/main.8661d53c.js",
-    "index.html": "/index.html",
-    "main.05fbb824.css.map": "/static/css/main.05fbb824.css.map",
-    "main.8661d53c.js.map": "/static/js/main.8661d53c.js.map"
+    "main.css": "/sentence-reader/static/css/main.05fbb824.css",
+    "main.js": "/sentence-reader/static/js/main.8661d53c.js",
+    "index.html": "/sentence-reader/index.html",
+    "main.05fbb824.css.map": "/sentence-reader/static/css/main.05fbb824.css.map",
+    "main.8661d53c.js.map": "/sentence-reader/static/js/main.8661d53c.js.map"
   },
   "entrypoints": [
     "static/css/main.05fbb824.css",
